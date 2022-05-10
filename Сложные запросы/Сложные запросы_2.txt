@@ -1,0 +1,48 @@
+-- Упражнение 2
+
+-- 1. Создайте таблицу student_presents с данными о посещаемости.
+
+CREATE TABLE `student_presents` (
+  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `student_id` INT(10) UNSIGNED NOT NULL,
+  `subject_id` INT(10) UNSIGNED NOT NULL,
+  `date` DATE NOT NULL,
+  `attendance` TINYINT NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+);
+
+-- 2. Заполните таблицу некоторыми произвольными значениями по каждому студенту на каждый прошедший день (не меньше 2 недель).
+
+-- Заполнил данные скриптом
+
+-- 3. Создайте отчет о посещаемости студентов по тем или иным дисциплинам.
+
+-- Общий отчёт
+SELECT date_format(date, "%d, %M") as day_of_classes, CONCAT_WS(' ', s.firstname, s.lastname) AS fullname, sj.name as subject_name, sp.attendance
+FROM student_presents as sp
+JOIN students as s ON s.id = sp.student_id
+JOIN subjects as sj ON sj.id = sp.subject_id
+GROUP BY date, subject_name, fullname
+limit 40;
+
+-- Отчёт по дате (3 сентября)
+SELECT *
+FROM (
+SELECT date_format(date, "%d, %M") as day_of_classes, CONCAT_WS(' ', s.firstname, s.lastname) AS fullname, sj.name as subject_name, sp.attendance
+FROM student_presents as sp
+JOIN students as s ON s.id = sp.student_id
+JOIN subjects as sj ON sj.id = sp.subject_id
+GROUP BY date, subject_name, fullname
+limit 100) as t
+WHERE day_of_classes = '03, September';
+
+-- Отчёт по дисциплине (Алгебра)
+SELECT *
+FROM (
+SELECT date_format(date, "%d, %M") as day_of_classes, CONCAT_WS(' ', s.firstname, s.lastname) AS fullname, sj.name as subject_name, sp.attendance
+FROM student_presents as sp
+JOIN students as s ON s.id = sp.student_id
+JOIN subjects as sj ON sj.id = sp.subject_id
+GROUP BY date, subject_name, fullname
+limit 100) as t
+WHERE subject_name = 'Алгебра';
