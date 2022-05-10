@@ -1,0 +1,61 @@
+-- Упражнение 1
+
+-- 1. Составьте отчетную таблицу об успеваемости студентов по каждому из предметов.
+
+SELECT CONCAT_WS(' ', s.firstname, s.lastname) AS fullname, sj.name, m.date, GROUP_CONCAT(m.mark) AS marks
+FROM students as s
+JOIN student_marks as m ON s.id = m.student_id
+JOIN subjects as sj ON sj.id = m.subject_id
+GROUP BY fullname, sj.name
+limit 33;
+
+-- 2. Вычислите средний балл по каждому предмету для каждого студента.
+
+SELECT CONCAT_WS(' ', s.firstname, s.lastname) AS fullname, sj.name, m.date , GROUP_CONCAT(m.mark) AS marks, AVG(m.mark) AS avg_mark
+FROM students as s
+JOIN student_marks as m ON s.id = m.student_id
+JOIN subjects as sj ON sj.id = m.subject_id
+GROUP BY fullname, sj.name
+limit 33;
+
+-- 3. Составьте по каждому студенту отчет о количестве тех или иных оценок.
+
+SELECT CONCAT_WS(' ', s.firstname, s.lastname) AS fullname, COUNT(m.mark) AS count_marks, AVG(m.mark) AS avg_mark
+FROM students as s
+JOIN student_marks as m ON s.id = m.student_id
+JOIN subjects as sj ON sj.id = m.subject_id
+GROUP BY fullname
+limit 33;
+
+-- 4. 
+-- Найдите самого успевающего студента.
+
+SELECT CONCAT_WS(' ', s.firstname, s.lastname) AS fullname, AVG(m.mark) AS avg_mark
+FROM students as s
+JOIN student_marks as m ON s.id = m.student_id
+GROUP BY fullname
+ORDER BY avg_mark DESC
+limit 1;
+
+-- Найдите самого неуспевающего студента.
+
+SELECT CONCAT_WS(' ', s.firstname, s.lastname) AS fullname, AVG(m.mark) AS avg_mark
+FROM students as s
+JOIN student_marks as m ON s.id = m.student_id
+GROUP BY fullname
+ORDER BY avg_mark ASC
+limit 1;
+
+-- 5. Найдите дисциплину, которая суммарно дается легче всего всем студентам.
+
+SELECT sj.name,
+(SELECT AVG(m.mark) from student_marks m JOIN subjects as sj ON m.subject_id = sj.id) avg_mark
+FROM subjects as sj WHERE sj.id =
+(SELECT sj.id FROM student_marks m JOIN subjects as sj ON sj.id = m.subject_id GROUP BY sj.id ORDER BY AVG (mark) DESC LIMIT 1)
+;
+
+-- 6. Выведите расписание предметов на каждый день.
+SELECT date_format(date, "%d, %M") as day_of_classes, sj.name
+from subject_schedules as ss
+JOIN subjects as sj ON sj.id = ss.subject_id
+ORDER BY date ASC LIMIT 300;
